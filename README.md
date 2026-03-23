@@ -33,6 +33,23 @@ Além disso, o projeto deve seguir boas práticas de desenvolvimento com Git, in
 
 ---
 
+## Estrutura do Projeto
+
+```
+pong/
+├── main.py            # Ponto de entrada da aplicação
+├── settings.py        # Constantes e configurações globais
+├── game.py            # Orquestrador do loop e fluxo de cenas
+├── ball.py            # Entidade: bola (posição, movimento, colisão)
+├── paddle.py          # Entidade: raquete (posição, limites)
+├── scoreboard.py      # Estado e regras do placar
+├── ai_controller.py   # Lógica de controle da IA
+├── renderer.py        # Toda a lógica de desenho
+└── .gitignore         # Arquivos ignorados pelo Git
+```
+
+---
+
 ## Funcionalidades
 
 * Menu inicial com interação por teclado
@@ -40,7 +57,20 @@ Além disso, o projeto deve seguir boas práticas de desenvolvimento com Git, in
 * Controle do jogador (teclas ↑ ↓)
 * Movimento automático do oponente (IA simples)
 * Detecção de colisão da bola com raquetes e paredes
+* Tela de vitória com opção de reiniciar ou voltar ao menu
 * Condição de vitória
+
+---
+
+## Controles
+
+| Ação             | Tecla  |
+|------------------|--------|
+| Mover para cima  | ↑      |
+| Mover para baixo | ↓      |
+| Iniciar jogo     | Espaço |
+| Jogar novamente  | Espaço |
+| Voltar ao menu   | ESC    |
 
 ---
 
@@ -48,27 +78,34 @@ Além disso, o projeto deve seguir boas práticas de desenvolvimento com Git, in
 
 ### Abstração
 
-O código foi organizado em funções e estruturas que isolam responsabilidades específicas, como:
+O código foi organizado em classes que representam conceitos reais do jogo:
 
-* Menu principal
-* Lógica do jogo
-* Renderização
+* `Bola` — encapsula posição, velocidade e comportamento de colisão
+* `Raquete` — encapsula posição e limites de movimento
+* `Placar` — encapsula pontuação e condição de vitória
+* `ControladorIA` — encapsula a lógica de decisão da IA
+* `Renderer` — encapsula toda a lógica de desenho
 
 ### Separação de Responsabilidades
 
-Cada parte do sistema possui uma função clara:
+Cada arquivo possui uma única responsabilidade clara:
 
-* Interface (renderização)
-* Lógica do jogo
-* Controle de entrada
+* `renderer.py` — único arquivo que chama `pygame.draw`
+* `scoreboard.py` — único que conhece a pontuação necessária para vencer
+* `ai_controller.py` — único que decide como a IA se move
+* `game.py` — coordena as entidades, sem saber como desenhá-las
 
-### SOLID (aplicação inicial)
+### SOLID
 
-* S: Funções com responsabilidades únicas
-* O: Estrutura preparada para expansão
-* L: Componentes reutilizáveis sem quebra de comportamento
-* I: Separação de funcionalidades
-* D: Baixo acoplamento entre partes do código
+**S — Single Responsibility:** cada classe tem exatamente uma razão para mudar. `Bola` muda se a física mudar; `Renderer` muda se o visual mudar — nunca os dois juntos.
+
+**O — Open/Closed:** para adicionar uma IA com dificuldade diferente, basta criar uma nova classe em `ai_controller.py` sem modificar o código existente.
+
+**L — Liskov Substitution:** `ControladorIA` pode ser substituída por qualquer outro controlador sem impacto em `game.py`.
+
+**I — Interface Segregation:** as classes recebem apenas o que precisam. A IA recebe `Raquete` e `Bola`, não o objeto `Jogo` inteiro.
+
+**D — Dependency Inversion:** `Jogo` depende das entidades (`Bola`, `Raquete`), não de lógica concreta de desenho ou IA.
 
 ---
 
@@ -77,76 +114,4 @@ Cada parte do sistema possui uma função clara:
 * Python 3
 * Pygame
 * Git e GitHub
-
----
-
-## Como Executar o Projeto
-
-### 1. Clone o repositório
-
-```bash
-git clone https://github.com/JvMartelli/pong.git
-```
-
-### 2. Acesse a pasta
-
-```bash
-cd seu-repositorio
-```
-
-### 3. Instale as dependências
-
-```bash
-pip install pygame
-```
-
-### 4. Execute o projeto
-
-```bash
-python main.py
-```
-
----
-
-## Fluxo de Trabalho (Git)
-
-Este projeto segue as seguintes práticas:
-
-* Cada nova funcionalidade é desenvolvida em uma branch específica
-* Uso obrigatório de Pull Requests (PRs)
-* Merge realizado apenas após validação
-* Histórico organizado para avaliação acadêmica
-
-### Exemplo de fluxo:
-
-```bash
-git checkout -b feature/nome-da-feature
-git add .
-git commit -m "feat: adiciona nova funcionalidade"
-git push origin feature/nome-da-feature
-```
-
----
-
-## Possíveis Melhorias
-
-* Adição de efeitos sonoros
-* Menu com interface gráfica mais avançada
-* Sistema de níveis/dificuldade
-* Multiplayer local
-* Melhor IA para o oponente
-* Animações e partículas
-
----
-
-## Avaliação
-
-A avaliação do projeto considera:
-
-* Qualidade do código (refatoração)
-* Aplicação de boas práticas
-* Organização do repositório
-* Uso correto de Git
-* Implementação de novas features em tempo real
-
 
