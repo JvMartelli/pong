@@ -1,10 +1,3 @@
-# =============================================================================
-# game.py
-# Orquestra o loop principal e a lógica de uma partida.
-# Princípio SRP: coordena as entidades, mas não sabe como desenhá-las nem
-# como a IA decide se mover — delega para as classes certas.
-# =============================================================================
-
 import sys
 import pygame
 from settings import (
@@ -58,10 +51,6 @@ class Jogo:
         if teclas[pygame.K_DOWN]:
             self.raquete1.mover_baixo()
 
-    # -------------------------------------------------------------------------
-    # Cenas
-    # -------------------------------------------------------------------------
-
     def cena_menu(self):
         """Exibe o menu principal até o jogador pressionar ESPAÇO."""
         while True:
@@ -93,12 +82,10 @@ class Jogo:
             self.bola.rebater_raquete(self.raquete1.rect)
             self.bola.rebater_raquete(self.raquete2.rect)
 
-            # Ponto para jogador 2 (bola saiu pela esquerda)
             if self.bola.saiu_pela_esquerda():
                 self.placar.ponto_jogador2()
                 self.bola.resetar(direcao=1)
 
-            # Ponto para jogador 1 (bola saiu pela direita)
             if self.bola.saiu_pela_direita():
                 self.placar.ponto_jogador1()
                 self.bola.resetar(direcao=-1)
@@ -135,10 +122,6 @@ class Jogo:
             self.renderer.desenhar_vitoria(vencedor)
             pygame.display.flip()
             self.clock.tick(FPS)
-
-    # -------------------------------------------------------------------------
-    # Loop de fluxo principal
-    # -------------------------------------------------------------------------
 
     def executar(self):
         """

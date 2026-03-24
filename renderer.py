@@ -1,9 +1,3 @@
-# =============================================================================
-# renderer.py
-# Responsável por toda a lógica de renderização do jogo.
-# Princípio SRP: nenhuma outra classe precisa chamar pygame.draw diretamente.
-# =============================================================================
-
 import pygame
 from settings import LARGURA, ALTURA, PRETO, BRANCO, CINZA
 from ball import Bola
@@ -77,7 +71,6 @@ class Renderer:
         )
         self.tela.blit(controles, controles.get_rect(center=(LARGURA // 2, ALTURA // 2)))
 
-        # Texto piscante
         if pygame.time.get_ticks() % 2000 < 1000:
             instrucao = self.fonte_pequena.render(
                 "Pressione ESPAÇO para jogar", True, BRANCO

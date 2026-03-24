@@ -1,11 +1,3 @@
-# =============================================================================
-# ai_controller.py
-# Controlador de IA para a raquete do jogador 2.
-# Princípio SRP: isola a lógica de decisão da IA das demais partes do jogo.
-# Princípio OCP: se quiser criar uma IA diferente (ex: difícil/fácil),
-# basta criar outra classe sem modificar esta.
-# =============================================================================
-
 from paddle import Raquete
 from ball import Bola
 

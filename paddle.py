@@ -1,9 +1,3 @@
-# =============================================================================
-# paddle.py
-# Entidade responsável pelo estado e comportamento de uma raquete.
-# Princípio SRP: só cuida de posição e limites de movimento da raquete.
-# =============================================================================
-
 import pygame
 from settings import (
     ALTURA, RAQUETE_LARGURA, RAQUETE_ALTURA, RAQUETE_VELOCIDADE, BRANCO

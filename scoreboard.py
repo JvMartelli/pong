@@ -1,9 +1,3 @@
-# =============================================================================
-# scoreboard.py
-# Responsável por armazenar e expor os pontos dos jogadores.
-# Princípio SRP: só cuida do estado de pontuação, não de como ela é desenhada.
-# =============================================================================
-
 from settings import PONTOS_PARA_VENCER
 
 

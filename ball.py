@@ -1,9 +1,3 @@
-# =============================================================================
-# ball.py
-# Entidade responsável pelo estado e comportamento da bola.
-# Princípio SRP: só cuida de posição, velocidade e colisões da bola.
-# =============================================================================
-
 import pygame
 from settings import (
     LARGURA, ALTURA, BOLA_RAIO, BOLA_VELOCIDADE_INICIAL, BRANCO
@@ -57,10 +51,8 @@ class Bola:
             raquete_rect: Rect da raquete com a qual a bola colidiu.
         """
         if self.rect.colliderect(raquete_rect):
-            # Raquete à esquerda: bola deve estar indo para a esquerda
             if raquete_rect.centerx < LARGURA // 2 and self.vel_x < 0:
                 self.vel_x = -self.vel_x
-            # Raquete à direita: bola deve estar indo para a direita
             elif raquete_rect.centerx > LARGURA // 2 and self.vel_x > 0:
                 self.vel_x = -self.vel_x
 
