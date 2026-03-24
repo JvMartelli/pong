@@ -1,7 +1,5 @@
 import pygame
-from settings import (
-    ALTURA, RAQUETE_LARGURA, RAQUETE_ALTURA, RAQUETE_VELOCIDADE, BRANCO
-)
+from settings import ALTURA, RAQUETE_LARGURA, RAQUETE_ALTURA, RAQUETE_VELOCIDADE, BRANCO
 
 
 class Raquete:

@@ -1,7 +1,5 @@
 import pygame
-from settings import (
-    LARGURA, ALTURA, BOLA_RAIO, BOLA_VELOCIDADE_INICIAL, BRANCO
-)
+from settings import LARGURA, ALTURA, BOLA_RAIO, BOLA_VELOCIDADE_INICIAL, BRANCO
 
 
 class Bola:
@@ -11,11 +9,11 @@ class Bola:
         self.resetar(direcao=1)
 
     def resetar(self, direcao: int = 1):
-
         self.x = LARGURA // 2
         self.y = ALTURA // 2
         self.vel_x = BOLA_VELOCIDADE_INICIAL * direcao
         self.vel_y = BOLA_VELOCIDADE_INICIAL
+        self._rebateu_parede = False
 
     @property
     def rect(self) -> pygame.Rect:
@@ -29,16 +27,24 @@ class Bola:
     def atualizar(self):
         self.x += self.vel_x
         self.y += self.vel_y
+        self._rebateu_parede = False
 
         if self.y - self.raio <= 0 or self.y + self.raio >= ALTURA:
             self.vel_y = -self.vel_y
+            self._rebateu_parede = True
 
-    def rebater_raquete(self, raquete_rect: pygame.Rect):
+    def rebateu_parede(self) -> bool:
+        return self._rebateu_parede
+
+    def rebater_raquete(self, raquete_rect: pygame.Rect) -> bool:
         if self.rect.colliderect(raquete_rect):
             if raquete_rect.centerx < LARGURA // 2 and self.vel_x < 0:
                 self.vel_x = -self.vel_x
+                return True
             elif raquete_rect.centerx > LARGURA // 2 and self.vel_x > 0:
                 self.vel_x = -self.vel_x
+                return True
+        return False
 
     def saiu_pela_esquerda(self) -> bool:
         return self.x + self.raio < 0
