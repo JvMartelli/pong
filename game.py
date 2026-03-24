@@ -11,9 +11,6 @@ from renderer import Renderer
 
 
 class Jogo:
-    """
-    Controla o fluxo completo do jogo: menu → partida → vitória → repetir.
-    """
 
     def __init__(self):
         pygame.init()
@@ -24,19 +21,12 @@ class Jogo:
         self.ia = ControladorIA()
 
     def _criar_entidades(self):
-        """Instancia as entidades de uma nova partida."""
         self.bola = Bola()
         self.raquete1 = Raquete(x=MARGEM_RAQUETE)
         self.raquete2 = Raquete(x=LARGURA - MARGEM_RAQUETE - RAQUETE_LARGURA)
         self.placar = Placar()
 
     def _processar_eventos(self) -> bool:
-        """
-        Processa eventos globais do pygame.
-
-        Returns:
-            False se o jogo deve encerrar, True caso contrário.
-        """
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
@@ -44,7 +34,6 @@ class Jogo:
         return True
 
     def _processar_input_jogador1(self):
-        """Lê as teclas e move a raquete do jogador 1 (setas)."""
         teclas = pygame.key.get_pressed()
         if teclas[pygame.K_UP]:
             self.raquete1.mover_cima()
@@ -52,7 +41,6 @@ class Jogo:
             self.raquete1.mover_baixo()
 
     def cena_menu(self):
-        """Exibe o menu principal até o jogador pressionar ESPAÇO."""
         while True:
             self._processar_eventos()
 
@@ -65,12 +53,6 @@ class Jogo:
             self.clock.tick(FPS)
 
     def cena_jogo(self) -> str:
-        """
-        Executa uma partida completa.
-
-        Returns:
-            Nome do vencedor ao fim da partida.
-        """
         self._criar_entidades()
 
         while True:
@@ -101,15 +83,6 @@ class Jogo:
             self.clock.tick(FPS)
 
     def cena_vitoria(self, vencedor: str) -> bool:
-        """
-        Exibe a tela de vitória.
-
-        Args:
-            vencedor: Nome do jogador que ganhou.
-
-        Returns:
-            True se o jogador quer jogar novamente, False para voltar ao menu.
-        """
         while True:
             self._processar_eventos()
 
@@ -124,10 +97,6 @@ class Jogo:
             self.clock.tick(FPS)
 
     def executar(self):
-        """
-        Ponto de entrada do jogo. Gerencia o fluxo entre as cenas:
-        menu → partida → vitória → (repetir ou voltar ao menu).
-        """
         while True:
             self.cena_menu()
 
