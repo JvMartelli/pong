@@ -1,13 +1,12 @@
 import sys
 import pygame
-from settings import (
-    LARGURA, ALTURA, FPS, TITULO, MARGEM_RAQUETE, RAQUETE_LARGURA
-)
+from settings import LARGURA, ALTURA, FPS, TITULO, MARGEM_RAQUETE, RAQUETE_LARGURA
 from ball import Bola
 from paddle import Raquete
 from scoreboard import Placar
 from ai_controller import ControladorIA
 from renderer import Renderer
+from sound_manager import GerenciadorSom
 
 
 class Jogo:
@@ -19,6 +18,7 @@ class Jogo:
         self.clock = pygame.time.Clock()
         self.renderer = Renderer(self.tela)
         self.ia = ControladorIA()
+        self.som = GerenciadorSom()
 
     def _criar_entidades(self):
         self.bola = Bola()
@@ -26,12 +26,11 @@ class Jogo:
         self.raquete2 = Raquete(x=LARGURA - MARGEM_RAQUETE - RAQUETE_LARGURA)
         self.placar = Placar()
 
-    def _processar_eventos(self) -> bool:
+    def _processar_eventos(self):
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        return True
 
     def _processar_input_jogador1(self):
         teclas = pygame.key.get_pressed()
@@ -43,17 +42,16 @@ class Jogo:
     def cena_menu(self):
         while True:
             self._processar_eventos()
-
             teclas = pygame.key.get_pressed()
             if teclas[pygame.K_SPACE]:
                 return
-
             self.renderer.desenhar_menu()
             pygame.display.flip()
             self.clock.tick(FPS)
 
     def cena_jogo(self) -> str:
         self._criar_entidades()
+        self.som.iniciar_trilha()
 
         while True:
             self._processar_eventos()
@@ -61,19 +59,28 @@ class Jogo:
             self.ia.atualizar(self.raquete2, self.bola)
 
             self.bola.atualizar()
-            self.bola.rebater_raquete(self.raquete1.rect)
-            self.bola.rebater_raquete(self.raquete2.rect)
+
+            if self.bola.rebater_raquete(self.raquete1.rect):
+                self.som.tocar_raquete()
+            if self.bola.rebater_raquete(self.raquete2.rect):
+                self.som.tocar_raquete()
+
+            #if self.bola.rebateu_parede():
+             #   self.som.tocar_parede()
 
             if self.bola.saiu_pela_esquerda():
                 self.placar.ponto_jogador2()
+                self.som.tocar_ponto()
                 self.bola.resetar(direcao=1)
 
             if self.bola.saiu_pela_direita():
                 self.placar.ponto_jogador1()
+                self.som.tocar_ponto()
                 self.bola.resetar(direcao=-1)
 
             vencedor = self.placar.vencedor()
             if vencedor:
+                self.som.parar_trilha()
                 return vencedor
 
             self.renderer.desenhar_jogo(
@@ -85,13 +92,11 @@ class Jogo:
     def cena_vitoria(self, vencedor: str) -> bool:
         while True:
             self._processar_eventos()
-
             teclas = pygame.key.get_pressed()
             if teclas[pygame.K_SPACE]:
                 return True
             if teclas[pygame.K_ESCAPE]:
                 return False
-
             self.renderer.desenhar_vitoria(vencedor)
             pygame.display.flip()
             self.clock.tick(FPS)
@@ -99,7 +104,6 @@ class Jogo:
     def executar(self):
         while True:
             self.cena_menu()
-
             while True:
                 vencedor = self.cena_jogo()
                 jogar_novamente = self.cena_vitoria(vencedor)
