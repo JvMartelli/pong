@@ -1,8 +1,13 @@
+import math
+import random
 import pygame
 from settings import LARGURA, ALTURA, BOLA_RAIO, BOLA_VELOCIDADE_INICIAL, BRANCO
 
 
 class Bola:
+
+    VELOCIDADE = BOLA_VELOCIDADE_INICIAL
+    CHANCE_IMPREVISIVEL = 0.25
 
     def __init__(self):
         self.raio = BOLA_RAIO
@@ -11,9 +16,15 @@ class Bola:
     def resetar(self, direcao: int = 1):
         self.x = LARGURA // 2
         self.y = ALTURA // 2
-        self.vel_x = BOLA_VELOCIDADE_INICIAL * direcao
-        self.vel_y = BOLA_VELOCIDADE_INICIAL
+        self.vel_x = self.VELOCIDADE * direcao
+        self.vel_y = random.uniform(-self.VELOCIDADE, self.VELOCIDADE)
         self._rebateu_parede = False
+
+    def _rebote_aleatorio(self, direcao_x: int):
+        angulo = random.uniform(-60, 60)
+        rad = math.radians(angulo)
+        self.vel_x = direcao_x * self.VELOCIDADE * abs(math.cos(rad))
+        self.vel_y = self.VELOCIDADE * math.sin(rad)
 
     @property
     def rect(self) -> pygame.Rect:
@@ -31,6 +42,13 @@ class Bola:
 
         if self.y - self.raio <= 0 or self.y + self.raio >= ALTURA:
             self.vel_y = -self.vel_y
+            if random.random() < self.CHANCE_IMPREVISIVEL:
+                direcao_x = 1 if self.vel_x > 0 else -1
+                self._rebote_aleatorio(direcao_x=direcao_x)
+                if self.y - self.raio <= 0:
+                    self.vel_y = abs(self.vel_y)
+                else:
+                    self.vel_y = -abs(self.vel_y)
             self._rebateu_parede = True
 
     def rebateu_parede(self) -> bool:
@@ -39,10 +57,10 @@ class Bola:
     def rebater_raquete(self, raquete_rect: pygame.Rect) -> bool:
         if self.rect.colliderect(raquete_rect):
             if raquete_rect.centerx < LARGURA // 2 and self.vel_x < 0:
-                self.vel_x = -self.vel_x
+                self._rebote_aleatorio(direcao_x=1)
                 return True
             elif raquete_rect.centerx > LARGURA // 2 and self.vel_x > 0:
-                self.vel_x = -self.vel_x
+                self._rebote_aleatorio(direcao_x=-1)
                 return True
         return False
 
