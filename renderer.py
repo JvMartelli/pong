@@ -1,6 +1,5 @@
 import pygame
 from settings import LARGURA, ALTURA, PRETO, BRANCO, CINZA
-from ball import Bola
 from paddle import Raquete
 from scoreboard import Placar
 
@@ -29,12 +28,13 @@ class Renderer:
         )
         self.tela.blit(texto, texto.get_rect(center=(LARGURA // 2, 30)))
 
-    def desenhar_jogo(self, bola: Bola, raquete1: Raquete, raquete2: Raquete, placar: Placar):
+    def desenhar_jogo(self, bolas: list, raquete1: Raquete, raquete2: Raquete, placar: Placar):
         self.limpar()
         self.desenhar_linha_central()
         raquete1.desenhar(self.tela)
         raquete2.desenhar(self.tela)
-        bola.desenhar(self.tela)
+        for bola in bolas:
+            bola.desenhar(self.tela)
         self.desenhar_placar(placar)
 
     def desenhar_menu(self):

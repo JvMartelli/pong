@@ -9,8 +9,10 @@ class Bola:
     VELOCIDADE = BOLA_VELOCIDADE_INICIAL
     CHANCE_IMPREVISIVEL = 0.25
 
-    def __init__(self):
+    def __init__(self, cor=BRANCO, verdadeira=True):
         self.raio = BOLA_RAIO
+        self.cor = cor
+        self.verdadeira = verdadeira
         self.resetar(direcao=1)
 
     def resetar(self, direcao: int = 1):
@@ -25,6 +27,22 @@ class Bola:
         rad = math.radians(angulo)
         self.vel_x = direcao_x * self.VELOCIDADE * abs(math.cos(rad))
         self.vel_y = self.VELOCIDADE * math.sin(rad)
+
+    def fragmentar(self) -> list:
+        fragmentos = []
+        for _ in range(3):
+            cor = (
+                random.randint(50, 255),
+                random.randint(50, 255),
+                random.randint(50, 255),
+            )
+            falsa = Bola(cor=cor, verdadeira=False)
+            falsa.x = self.x
+            falsa.y = self.y
+            falsa.vel_x = self.vel_x * random.uniform(0.8, 1.2)
+            falsa.vel_y = random.uniform(-self.VELOCIDADE, self.VELOCIDADE)
+            fragmentos.append(falsa)
+        return fragmentos
 
     @property
     def rect(self) -> pygame.Rect:
@@ -71,4 +89,4 @@ class Bola:
         return self.x - self.raio > LARGURA
 
     def desenhar(self, tela: pygame.Surface):
-        pygame.draw.circle(tela, BRANCO, (self.x, self.y), self.raio)
+        pygame.draw.circle(tela, self.cor, (int(self.x), int(self.y)), self.raio)
