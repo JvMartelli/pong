@@ -8,6 +8,8 @@ from ai_controller import ControladorIA
 from renderer import Renderer
 from sound_manager import GerenciadorSom
 
+INTERVALO_FRAGMENTACAO = 5000  # milissegundos
+
 
 class Jogo:
 
@@ -21,10 +23,17 @@ class Jogo:
         self.som = GerenciadorSom()
 
     def _criar_entidades(self):
-        self.bola = Bola()
+        self.bolas = [Bola()]
         self.raquete1 = Raquete(x=MARGEM_RAQUETE)
         self.raquete2 = Raquete(x=LARGURA - MARGEM_RAQUETE - RAQUETE_LARGURA)
         self.placar = Placar()
+        self.ultimo_fragmento = pygame.time.get_ticks()
+
+    def _bola_verdadeira(self) -> Bola | None:
+        for bola in self.bolas:
+            if bola.verdadeira:
+                return bola
+        return None
 
     def _processar_eventos(self):
         for evento in pygame.event.get():
@@ -38,6 +47,20 @@ class Jogo:
             self.raquete1.mover_cima()
         if teclas[pygame.K_DOWN]:
             self.raquete1.mover_baixo()
+
+    def _processar_fragmentacao(self):
+        agora = pygame.time.get_ticks()
+        if agora - self.ultimo_fragmento >= INTERVALO_FRAGMENTACAO:
+            bola_v = self._bola_verdadeira()
+            if bola_v:
+                self.bolas += bola_v.fragmentar()
+                self.ultimo_fragmento = agora
+
+    def _resetar_bolas(self, direcao: int):
+        bola = Bola()
+        bola.resetar(direcao=direcao)
+        self.bolas = [bola]
+        self.ultimo_fragmento = pygame.time.get_ticks()
 
     def cena_menu(self):
         while True:
@@ -56,27 +79,32 @@ class Jogo:
         while True:
             self._processar_eventos()
             self._processar_input_jogador1()
-            self.ia.atualizar(self.raquete2, self.bola)
 
-            self.bola.atualizar()
+            bola_v = self._bola_verdadeira()
+            if bola_v:
+                self.ia.atualizar(self.raquete2, bola_v)
 
-            if self.bola.rebater_raquete(self.raquete1.rect):
-                self.som.tocar_raquete()
-            if self.bola.rebater_raquete(self.raquete2.rect):
-                self.som.tocar_raquete()
+            self._processar_fragmentacao()
 
-            #if self.bola.rebateu_parede():
-             #   self.som.tocar_parede()
+            for bola in self.bolas:
+                bola.atualizar()
 
-            if self.bola.saiu_pela_esquerda():
-                self.placar.ponto_jogador2()
-                self.som.tocar_ponto()
-                self.bola.resetar(direcao=1)
+                if bola.rebater_raquete(self.raquete1.rect):
+                    self.som.tocar_raquete()
+                if bola.rebater_raquete(self.raquete2.rect):
+                    self.som.tocar_raquete()
 
-            if self.bola.saiu_pela_direita():
-                self.placar.ponto_jogador1()
-                self.som.tocar_ponto()
-                self.bola.resetar(direcao=-1)
+            bola_v = self._bola_verdadeira()
+            if bola_v:
+                if bola_v.saiu_pela_esquerda():
+                    self.placar.ponto_jogador2()
+                    self.som.tocar_ponto()
+                    self._resetar_bolas(direcao=1)
+
+                elif bola_v.saiu_pela_direita():
+                    self.placar.ponto_jogador1()
+                    self.som.tocar_ponto()
+                    self._resetar_bolas(direcao=-1)
 
             vencedor = self.placar.vencedor()
             if vencedor:
@@ -84,7 +112,7 @@ class Jogo:
                 return vencedor
 
             self.renderer.desenhar_jogo(
-                self.bola, self.raquete1, self.raquete2, self.placar
+                self.bolas, self.raquete1, self.raquete2, self.placar
             )
             pygame.display.flip()
             self.clock.tick(FPS)
